@@ -61,8 +61,7 @@ export async function putCustomers(req, res) {
 
     try {
         const user = await db.query(`SELECT * FROM customers WHERE cpf = $1 ;`, [cpf]);
-        console.log(user.rows)
-        
+                
         if (user.rows.length !== 0 && user.rows[0].id !== parseInt(id)) {
             return res.status(409).send({ message: "Cliente já cadastrado!" });
         }
