@@ -19,7 +19,7 @@ export async function postGame(req, res) {
         if (game.rows.length !== 0) {
             return res.status(409).send({ message: "Jogo já cadastrado!" });
         }
-        await db.query(`INSERT INTO games (name, image, stockTotal, pricePerDay) VALUES ($1, $2, $3, $4);`, [name, image, stockTotal, pricePerDay]);
+        await db.query(`INSERT INTO games (name, image, "stockTotal", "pricePerDay") VALUES ($1, $2, $3, $4);`, [name, image, stockTotal, pricePerDay]);
 
         res.sendStatus(201);
     } catch (e) {
