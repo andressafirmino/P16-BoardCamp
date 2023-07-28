@@ -34,7 +34,7 @@ export async function getCustomersId(req, res) {
               birthday: formatDate
             }
           });     
-        res.send(updatedData);
+        res.send(updatedData[0]);
     } catch (e) {
         res.status(500).send(e.message);
     }
