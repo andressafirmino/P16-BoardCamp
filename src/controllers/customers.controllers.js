@@ -4,7 +4,16 @@ export async function getCustomers(req, res) {
 
     try {
         const customers = await db.query(`SELECT * FROM customers;`);
-        res.send(customers.rows);
+        const updatedData = customers.rows.map(item => {
+            const date = new Date(item.birthday);
+            const formatDate = date.toISOString().split('T')[0];
+            return {
+              ...item,
+              birthday: formatDate
+            }
+          });
+          
+        res.send(updatedData);
     } catch (e) {
         res.status(500).send(e.message);
     }
@@ -18,6 +27,7 @@ export async function getCustomersId(req, res) {
         if(customer.rows.length === 0) {
             return res.status(404).send({ message: "Usuário não encontrado!" });
         }
+        
         res.send(customer.rows);
     } catch (e) {
         res.status(500).send(e.message);
