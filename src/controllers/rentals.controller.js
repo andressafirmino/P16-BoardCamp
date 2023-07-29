@@ -55,8 +55,9 @@ export async function postReturn (req, res) {
         }  
         if(rental.rows[0].returnDate !== null) {
             return res.status(400).send({message: "Jogo já devolvido!"});
-        }      
-        res.send(200);
+        }  
+        await db.query(`UPDATE rentals SET "returnDate" = $1 WHERE id = $2;`, [new Date(), id]);    
+        res.sendStatus(200);
     } catch (e) {
         res.status(500).send(e.message);
     }
