@@ -62,3 +62,8 @@ export async function postReturn (req, res) {
         res.status(500).send(e.message);
     }
 }
+
+export async function deleteRentals(req, res) {
+    const {id} = req.params;
+    res.sendStatus(200);
+}
