@@ -44,3 +44,13 @@ export async function postRentals(req, res) {
         res.status(500).send(e.message);
     }
 }
+
+export async function postReturn (req, res) {
+    const {id} = req.params;
+    
+    try {
+        res.send(200);
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+}

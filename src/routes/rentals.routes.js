@@ -7,5 +7,6 @@ const rentalsRouter = Router();
 
 rentalsRouter.get("/rentals", getRentals);
 rentalsRouter.post("/rentals", validateSchema(postRentalsSchema), postRentals);
+rentalsRouter.post("/rentals/:id/return", postRentals);
 
 export default rentalsRouter;
