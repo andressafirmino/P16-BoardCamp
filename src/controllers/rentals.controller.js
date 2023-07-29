@@ -65,5 +65,14 @@ export async function postReturn (req, res) {
 
 export async function deleteRentals(req, res) {
     const {id} = req.params;
-    res.sendStatus(200);
+    
+    try {
+        const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
+        if (rental.rows.length === 0) {
+            return res.status(404).send({ message: "Aluguel não encontrado!" });
+        }  
+        res.sendStatus(200);
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
 }
