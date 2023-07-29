@@ -9,7 +9,8 @@ export async function postRentals(req, res) {
 
     try {
         const customer = await db.query(`SELECT * FROM customers WHERE id= $1;`, [customerId]);
-        if (customer.rows.length === 0) {
+        const game = await db.query(`SELECT * FROM games WHERE id= $1;`, [gameId]);
+        if (customer.rows.length === 0 || game.rows.length === 0) {
             return res.sendStatus(400);
         }
         const price = await db.query(`SELECT ("pricePerDay") FROM games WHERE id = $1;`, [gameId]);
