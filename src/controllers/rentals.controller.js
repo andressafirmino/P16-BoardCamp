@@ -15,7 +15,7 @@ export async function getRentals(req, res) {
             const formatDate = date.toISOString().split('T')[0];
             return {
                 ...item,
-                rentDate: formatDate
+                rentDate: formatDate,
             }
         });
         res.send(updatedData);
@@ -32,7 +32,7 @@ export async function postRentals(req, res) {
         const customer = await db.query(`SELECT * FROM customers WHERE id= $1;`, [customerId]);
         const game = await db.query(`SELECT * FROM games WHERE id= $1;`, [gameId]);
         const rental = await db.query(`SELECT * FROM rentals WHERE "gameId"= $1;`, [gameId]);
-        
+
         if (customer.rows.length === 0 || game.rows.length === 0 || game.rows[0].stockTotal <= rental.rows.length) {
             return res.sendStatus(400);
         }
@@ -45,18 +45,18 @@ export async function postRentals(req, res) {
     }
 }
 
-export async function postReturn (req, res) {
-    const {id} = req.params;
+export async function postReturn(req, res) {
+    const { id } = req.params;
 
     try {
         const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
         if (rental.rows.length === 0) {
             return res.status(404).send({ message: "Aluguel não encontrado!" });
-        }  
-        if(rental.rows[0].returnDate !== null) {
-            return res.status(400).send({message: "Jogo já devolvido!"});
-        }  
-        await db.query(`UPDATE rentals SET "returnDate" = $1 WHERE id = $2;`, [new Date(), id]);    
+        }
+        if (rental.rows[0].returnDate !== null) {
+            return res.status(400).send({ message: "Jogo já devolvido!" });
+        }
+        await db.query(`UPDATE rentals SET "returnDate" = $1 WHERE id = $2;`, [new Date(), id]);
         res.sendStatus(200);
     } catch (e) {
         res.status(500).send(e.message);
@@ -64,14 +64,17 @@ export async function postReturn (req, res) {
 }
 
 export async function deleteRentals(req, res) {
-    const {id} = req.params;
-    
+    const { id } = req.params;
+
     try {
         const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
         console.log(rental.rows);
         if (rental.rows.length === 0) {
             return res.status(404).send({ message: "Aluguel não encontrado!" });
-        }  
+        }
+        if (rental.rows[0].returnDate === null) {
+            return res.status(400).send({ message: "Jogo não devolvido!" });
+        }
         res.sendStatus(200);
     } catch (e) {
         res.status(500).send(e.message);
