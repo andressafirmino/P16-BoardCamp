@@ -3,10 +3,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const {Pool} = pg;
+const { Pool } = pg;
 
-const connection = new Pool({
-    connectionString: process.env.DATABASE_URL
-  });
+const connection = {
+  connectionString: process.env.DATABASE_URL,
+};
 
-export const db = connection;
+if (process.env.NODE_ENV === "production") connection.ssl = true;
+
+export const db = new Pool(connection);
