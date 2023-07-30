@@ -2,8 +2,18 @@ import { db } from "../database/database.js";
 
 export async function getCustomers(req, res) {
 
+    const {cpf} = req.query;
+
     try {
-        const customers = await db.query(`SELECT * FROM customers;`);
+        let customers = [];
+        if (typeof cpf !== 'undefined' && cpf !== '') {
+            // Construir a consulta SQL usando o operador LIKE
+            customers = await db.query(`SELECT * FROM games WHERE name LIKE $1;`, [`${cpf}%`]);
+
+            // Execute a consulta SQL no banco de dados aqui
+        } else {
+            customers = await db.query(`SELECT * FROM customers;`);
+        }
         const updatedData = customers.rows.map(item => {
             const date = new Date(item.birthday);
             const formatDate = date.toISOString().split('T')[0];
