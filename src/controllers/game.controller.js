@@ -3,14 +3,17 @@ import { db } from "../database/database.js";
 
 export async function getGame(req, res) {
 
-    const { name } = req.query
+    const { name, order, desc } = req.query
 
     try {
         let games = [];
         if (typeof name !== 'undefined' && name !== '') {
-            games = await db.query(`SELECT * FROM games WHERE name LIKE $1;`, [`${name}%`]);
+            games = await db.query(`SELECT * FROM games WHERE name LIKE $1 ;`, [`${name}%`]);
         } else {
             games = await db.query(`SELECT * FROM games;`);
+        }
+        if (desc) {
+            games.reverse();
         }
         res.send(games.rows);
     } catch (e) {
