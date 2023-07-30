@@ -74,7 +74,7 @@ export async function deleteRentals(req, res) {
         if (rental.rows[0].returnDate === null) {
             return res.status(400).send({ message: "Jogo não devolvido!" });
         }
-        db.query(`DELETE FROM rentals WHERE id = $1;`, [id]);
+        await db.query(`DELETE FROM rentals WHERE id = $1;`, [id]);
         res.sendStatus(200);
     } catch (e) {
         res.status(500).send(e.message);
