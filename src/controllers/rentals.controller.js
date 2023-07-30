@@ -49,17 +49,21 @@ let delay = 0;
 // multa por atraso
 let delayF = 0;
 function counterDays(alugado, dias, entrega) {
+    console.log(alugado)
+    console.log(dias)
+    console.log(entrega)
     let formatAligado = new Date(alugado);
     formatAligado.setDate(formatAligado.getDate() + dias);
     const rentDate = new Date(formatAligado);
     const formatDate = rentDate.toISOString().split('T')[0];
 
     const dat1 =new Date(entrega);
+
     const dat2 = new Date(formatDate);
     const result = dat1 - dat2;
     const calculo = 24 * 60 * 60 * 1000;
     delay = result / calculo;
-
+    console.log(delay)
 }
 
 export async function postReturn(req, res) {
@@ -77,8 +81,8 @@ export async function postReturn(req, res) {
         const formatDate = rentDate.toISOString().split('T')[0];
 
         const entrega = new Date()
-        console.log(entrega)
-        counterDays(formatDate, rental.rows[0].daysRented, entrega);
+        const formaEntrega = entrega.toISOString().split('T')[0];
+        counterDays(formatDate, rental.rows[0].daysRented, formaEntrega);
 
         if (delay > 0) {
             delayF = delay * (rental.rows[0].originalPrice / rental.rows[0].daysRented)
