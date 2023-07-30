@@ -68,14 +68,13 @@ export async function deleteRentals(req, res) {
 
     try {
         const rental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
-        console.log(rental.rows);
         if (rental.rows.length === 0) {
             return res.status(404).send({ message: "Aluguel não encontrado!" });
         }
         if (rental.rows[0].returnDate === null) {
             return res.status(400).send({ message: "Jogo não devolvido!" });
         }
-        db.query(`DELETE FROM usuarios WHERE id = $1;`, [id])
+        db.query(`DELETE FROM rentals WHERE id = $1;`, [id]);
         res.sendStatus(200);
     } catch (e) {
         res.status(500).send(e.message);
