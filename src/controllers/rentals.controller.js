@@ -1,15 +1,37 @@
 import { db } from "../database/database.js";
 
 export async function getRentals(req, res) {
+    const { customerId, gameId } = req.query;
+
     try {
-        const rentals = await db.query(`
+        let rentals = [];
+        if (typeof customerId !== 'undefined' && customerId !== '') {
+            rentals = await db.query(`
+        SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
+        json_build_object('id', games.id, 'name', games.name) AS game
+        FROM rentals
+        JOIN customers ON rentals."customerId" = customers.id
+        JOIN games ON rentals."gameId" = games.id
+        WHERE "customerId" = $1
+        ;`, [customerId]);
+        }else if (typeof gameId !== 'undefined' && gameId !== '') {
+            rentals = await db.query(`
+        SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
+        json_build_object('id', games.id, 'name', games.name) AS game
+        FROM rentals
+        JOIN customers ON rentals."customerId" = customers.id
+        JOIN games ON rentals."gameId" = games.id
+        WHERE "gameId" = $1
+        ;`, [gameId]);
+        } else {
+        rentals = await db.query(`
         SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
         json_build_object('id', games.id, 'name', games.name) AS game
         FROM rentals
         JOIN customers ON rentals."customerId" = customers.id
         JOIN games ON rentals."gameId" = games.id
         ;`);
-        console.log(rentals.rows)
+        }
         const updatedData = rentals.rows.map(item => {
             const date = new Date(item.rentDate);
             const formatDate = date.toISOString().split('T')[0];
@@ -57,7 +79,7 @@ function counterDays(alugado, dias, entrega) {
     const rentDate = new Date(formatAligado);
     const formatDate = rentDate.toISOString().split('T')[0];
 
-    const dat1 =new Date(entrega);
+    const dat1 = new Date(entrega);
 
     const dat2 = new Date(formatDate);
     const result = dat1 - dat2;
