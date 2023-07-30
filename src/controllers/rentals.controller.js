@@ -76,7 +76,9 @@ export async function postReturn(req, res) {
         const rentDate = new Date(rental.rows[0].rentDate);
         const formatDate = rentDate.toISOString().split('T')[0];
 
-        counterDays(formatDate, rental.rows[0].daysRented, new Date());
+        const entrega = new Date()
+        console.log(entrega)
+        counterDays(formatDate, rental.rows[0].daysRented, entrega);
 
         if (delay > 0) {
             delayF = delay * (rental.rows[0].originalPrice / rental.rows[0].daysRented)
