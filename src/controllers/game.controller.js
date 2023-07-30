@@ -3,13 +3,14 @@ import { db } from "../database/database.js";
 
 export async function getGame(req, res) {
 
-    const name = req.query
+    const { name } = req.query
 
+    console.log(name);
     try {
         let games = [];
-        if (typeof pattern !== 'undefined' && pattern !== '') {
+        if (typeof name !== 'undefined' && name !== '') {
             // Construir a consulta SQL usando o operador LIKE
-            games = await db.query(`SELECT * FROM table_name WHERE column_name LIKE $1;`, [`${name}%`]);
+            games = await db.query(`SELECT * FROM games WHERE name LIKE $1;`, [`${name}%`]);
 
             // Execute a consulta SQL no banco de dados aqui
         } else {
