@@ -6,7 +6,7 @@ export async function getGame(req, res) {
     const name = req.query
 
     try {
-        const games = [];
+        let games = [];
         if (typeof pattern !== 'undefined' && pattern !== '') {
             // Construir a consulta SQL usando o operador LIKE
             games = await db.query(`SELECT * FROM table_name WHERE column_name LIKE $1;`, [`${name}%`]);
@@ -15,7 +15,6 @@ export async function getGame(req, res) {
         } else {
             games = await db.query(`SELECT * FROM games;`);
         }
-
         res.send(games.rows);
     } catch (e) {
         res.status(500).send(e.message);
