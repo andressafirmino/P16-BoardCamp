@@ -12,8 +12,11 @@ export async function getGame(req, res) {
         } else {
             games = await db.query(`SELECT * FROM games;`);
         }
+        if (typeof order !== 'undefined' && order !== '') {
+            games += await db.query(`SELECT ORDER BY NULLIF(${order}, '') ASC NULLS LAST`);
+        }
         if (desc) {
-            games.reverse();
+            games.rows.reverse();
         }
         res.send(games.rows);
     } catch (e) {
