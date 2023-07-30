@@ -44,6 +44,23 @@ export async function postRentals(req, res) {
         res.status(500).send(e.message);
     }
 }
+// dias atrasados
+let delay = 0;
+// multa por atraso
+let delayF = 0;
+function counterDays(alugado, dias, entrega) {
+    let formatAligado = new Date(alugado);
+    formatAligado.setDate(formatAligado.getDate() + dias);
+    const rentDate = new Date(formatAligado);
+    const formatDate = rentDate.toISOString().split('T')[0];
+
+    const dat1 =new Date(entrega);
+    const dat2 = new Date(formatDate);
+    const result = dat1 - dat2;
+    const calculo = 24 * 60 * 60 * 1000;
+    delay = result / calculo;
+
+}
 
 export async function postReturn(req, res) {
     const { id } = req.params;
@@ -56,7 +73,16 @@ export async function postReturn(req, res) {
         if (rental.rows[0].returnDate !== null) {
             return res.status(400).send({ message: "Jogo já devolvido!" });
         }
-        await db.query(`UPDATE rentals SET "returnDate" = $1 WHERE id = $2;`, [new Date(), id]);
+        const rentDate = new Date(rental.rows[0].rentDate);
+        const formatDate = rentDate.toISOString().split('T')[0];
+
+        counterDays(formatDate, rental.rows[0].daysRented, new Date());
+
+        if (delay > 0) {
+            delayF = delay * (rental.rows[0].originalPrice / rental.rows[0].daysRented)
+        }
+
+        await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`, [new Date(), delayF, id]);
         res.sendStatus(200);
     } catch (e) {
         res.status(500).send(e.message);
