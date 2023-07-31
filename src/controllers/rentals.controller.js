@@ -1,20 +1,69 @@
 import { db } from "../database/database.js";
 
 export async function getRentals(req, res) {
-    const { customerId, gameId } = req.query;
+    const { customerId, gameId, offset, limit, order, desc, status, startDate } = req.query;
 
     try {
-        let rentals = [];
-     {
-        rentals = await db.query(`
+        const rentals = [];
+        let query = `
         SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
         json_build_object('id', games.id, 'name', games.name) AS game
         FROM rentals
         JOIN customers ON rentals."customerId" = customers.id
         JOIN games ON rentals."gameId" = games.id
-        ;`);
+        `;
+        const conditional = []
+        if (typeof customerId !== 'undefined' && customerId !== '') {
+            rentals.push(customerId);
+            conditional.push(`"customerId" = $${rentals.length}`);
         }
-        const updatedData = rentals.rows.map(item => {
+        if (typeof gameId !== 'undefined' && gameId !== '') {
+            rentals.push(gameId);
+            conditional.push(`"gameId" = $${rentals.length}`);
+        }       
+        if (typeof order !== 'undefined' && order !== '') {
+            const validadeColumn = ['id', "customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee"];
+
+            if (validadeColumn.includes(order)) {
+                query += ` ORDER BY "${order}"`;
+                if (typeof desc !== 'undefined' && desc.toLowerCase() === 'true') {
+                    query += ' DESC';
+                }
+            } else {
+                return res.status(400).send({message: "Parâmetro inválido!"});
+            }            
+        }
+        if(typeof startDate !== 'undefined' && startDate !== '') {
+            const formatStartDate = new Date(startDate);
+            if(isNaN(formatStartDate)){
+                return res.status(400).send({message: "Data inválida!"});
+            }
+            const formatDate = formatStartDate.toISOString().split('T')[0];
+            rentals.push(formatDate);
+            conditional.push(`"rentDate" >= $${rentals.length}`);
+        }
+        const validateStatus = {
+            open: ' "returnDate" IS NULL',
+            close: ' "returnDate" IS NOT NULL'
+        }
+        if(typeof status !== 'undefined' && status in validateStatus) {
+            conditional.push(validateStatus[status])
+        } else if(typeof status !== 'undefined') {
+            return res.status(400).send({message: "Status inválido!"});
+        }
+        if(conditional.length > 0) {
+            query += ' WHERE' + conditional.join(' AND ');
+        }
+        if (typeof offset !== 'undefined' && offset !== '') {
+            rentals.push(offset);
+            query += ' OFFSET $' + rentals.length;
+        }
+        if (typeof limit !== 'undefined' && limit !== '') {
+            rentals.push(limit);
+            query += ' LIMIT $' + rentals.length;
+        }
+        const result = await db.query(query, rentals);
+        const updatedData = result.rows.map(item => {
             const date = new Date(item.rentDate);
             const formatDate = date.toISOString().split('T')[0];
             return {
