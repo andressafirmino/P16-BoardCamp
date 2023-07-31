@@ -9,24 +9,24 @@ export async function getGame(req, res) {
         let query = 'SELECT * FROM games';
         const games = [];
 
-        if (typeof name !== 'underfined' && name !== '') {
+        if (typeof name !== 'undefined' && name !== '') {
             games.push(`${name}%`);
             query += 'WHERE name LIKE $1';
         }
-        if (typeof offset !== 'underfined' && offset !== '') {
+        if (typeof offset !== 'undefined' && offset !== '') {
             games.push(offset);
             query += ' OFFSET $' + games.length;
         }
-        if (typeof limit !== 'underfined' && limit !== '') {
+        if (typeof limit !== 'undefined' && limit !== '') {
             games.push(limit);
             query += ' LIMIT $' + games.length;
         }
-        if (typeof order !== 'underfined' && order !== '') {
+        if (typeof order !== 'undefined' && order !== '') {
             const validadeColumn = ['name', 'id', 'image', "stockTotal", "pricePerDay"]
 
             if (validadeColumn.includes(order)) {
                 query += ' ORDER BY "' + order + '"';
-                if (typeof desc !== 'underfined' && desc.toLowerCase() === 'true') {
+                if (typeof desc !== 'undefined' && desc.toLowerCase() === 'true') {
                     query += ' DESC';
                 }
             } else {

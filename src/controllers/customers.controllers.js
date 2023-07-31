@@ -2,19 +2,38 @@ import { db } from "../database/database.js";
 
 export async function getCustomers(req, res) {
 
-    const {cpf} = req.query;
+    const {cpf, offset, limit, order, desc} = req.query;
 
     try {
-        let customers = [];
-        if (typeof cpf !== 'undefined' && cpf !== '') {
-            // Construir a consulta SQL usando o operador LIKE
-            customers = await db.query(`SELECT * FROM games WHERE name LIKE $1;`, [`${cpf}%`]);
+        let query = 'SELECT * FROM customers';
+        const customers = [];
 
-            // Execute a consulta SQL no banco de dados aqui
-        } else {
-            customers = await db.query(`SELECT * FROM customers;`);
+        if (typeof cpf !== 'underfined' && cpf !== '') {
+            customers.push(`${cpf}%`);
+            query += 'WHERE cpf LIKE $1';
         }
-        const updatedData = customers.rows.map(item => {
+        if (typeof offset !== 'underfined' && offset !== '') {
+            customers.push(offset);
+            query += ' OFFSET $' + customers.length;
+        }
+        if (typeof limit !== 'underfined' && limit !== '') {
+            customers.push(limit);
+            query += ' LIMIT $' + customers.length;
+        }
+        if (typeof order !== 'underfined' && order !== '') {
+            const validadeColumn = ['name', 'id', 'cpf', "phone", "birthday"]
+
+            if (validadeColumn.includes(order)) {
+                query += ' ORDER BY "' + order + '"';
+                if (typeof desc !== 'underfined' && desc.toLowerCase() === 'true') {
+                    query += ' DESC';
+                }
+            } else {
+                return res.status(400).send({message: "Parâmetro inválido!"});
+            }            
+        }
+        const result = await db.query(query, customers);
+        const updatedData = result.rows.map(item => {
             const date = new Date(item.birthday);
             const formatDate = date.toISOString().split('T')[0];
             return {
