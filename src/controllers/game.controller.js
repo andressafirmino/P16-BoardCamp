@@ -3,22 +3,39 @@ import { db } from "../database/database.js";
 
 export async function getGame(req, res) {
 
-    const { name, order, desc } = req.query
+    const { name, offset, limit, order, desc } = req.query
 
     try {
-        let games = [];
-        if (typeof name !== 'undefined' && name !== '') {
-            games = await db.query(`SELECT * FROM games WHERE name LIKE $1 ;`, [`${name}%`]);
-        } else {
-            games = await db.query(`SELECT * FROM games;`);
+        let query = 'SELECT * FROM games';
+        const games = [];
+
+        if (typeof name !== 'underfined' && name !== '') {
+            games.push(`${name}%`);
+            query += 'WHERE name LIKE $1';
         }
-        if (typeof order !== 'undefined' && order !== '') {
-            games += await db.query(`SELECT ORDER BY NULLIF(${order}, '') ASC NULLS LAST`);
+        if (typeof offset !== 'underfined' && offset !== '') {
+            games.push(offset);
+            query += ' OFFSET $' + games.length;
         }
-        if (desc) {
-            games.rows.reverse();
+        if (typeof limit !== 'underfined' && limit !== '') {
+            games.push(limit);
+            query += ' LIMIT $' + games.length;
         }
-        res.send(games.rows);
+        if (typeof order !== 'underfined' && order !== '') {
+            const validadeColumn = ['name', 'id', 'image', "stockTotal", "pricePerDay"]
+
+            if (validadeColumn.includes(order)) {
+                query += ' ORDER BY "' + order + '"';
+                if (typeof desc !== 'underfined' && desc.toLowerCase() === 'true') {
+                    query += ' DESC';
+                }
+            } else {
+                return res.status(400).send({message: "Parâmetro inválido!"});
+            }            
+        }
+        const result = await db.query(query, games);
+        const request = result.rows;
+        res.send(request);
     } catch (e) {
         res.status(500).send(e.message);
     }
