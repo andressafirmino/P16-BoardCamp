@@ -44,7 +44,7 @@ export async function getRentals(req, res) {
         }
         const validateStatus = {
             open: ' "returnDate" IS NULL',
-            close: ' "returnDate" IS NOT NULL'
+            closed: ' "returnDate" IS NOT NULL'
         }
         if (typeof status !== 'undefined' && status in validateStatus) {
             conditional.push(validateStatus[status])
