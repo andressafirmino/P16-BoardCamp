@@ -8,24 +8,24 @@ export async function getCustomers(req, res) {
         let query = 'SELECT * FROM customers';
         const customers = [];
 
-        if (typeof cpf !== 'underfined' && cpf !== '') {
+        if (typeof cpf !== 'undefined' && cpf !== '') {
             customers.push(`${cpf}%`);
             query += 'WHERE cpf LIKE $1';
         }
-        if (typeof offset !== 'underfined' && offset !== '') {
+        if (typeof offset !== 'undefined' && offset !== '') {
             customers.push(offset);
             query += ' OFFSET $' + customers.length;
         }
-        if (typeof limit !== 'underfined' && limit !== '') {
+        if (typeof limit !== 'undefined' && limit !== '') {
             customers.push(limit);
             query += ' LIMIT $' + customers.length;
         }
-        if (typeof order !== 'underfined' && order !== '') {
+        if (typeof order !== 'undefined' && order !== '') {
             const validadeColumn = ['name', 'id', 'cpf', "phone", "birthday"]
 
             if (validadeColumn.includes(order)) {
                 query += ' ORDER BY "' + order + '"';
-                if (typeof desc !== 'underfined' && desc.toLowerCase() === 'true') {
+                if (typeof desc !== 'undefined' && desc.toLowerCase() === 'true') {
                     query += ' DESC';
                 }
             } else {
