@@ -5,25 +5,7 @@ export async function getRentals(req, res) {
 
     try {
         let rentals = [];
-        if (typeof customerId !== 'undefined' && customerId !== '') {
-            rentals = await db.query(`
-        SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
-        json_build_object('id', games.id, 'name', games.name) AS game
-        FROM rentals
-        JOIN customers ON rentals."customerId" = customers.id
-        JOIN games ON rentals."gameId" = games.id
-        WHERE "customerId" = $1
-        ;`, [customerId]);
-        }else if (typeof gameId !== 'undefined' && gameId !== '') {
-            rentals = await db.query(`
-        SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
-        json_build_object('id', games.id, 'name', games.name) AS game
-        FROM rentals
-        JOIN customers ON rentals."customerId" = customers.id
-        JOIN games ON rentals."gameId" = games.id
-        WHERE "gameId" = $1
-        ;`, [gameId]);
-        } else {
+     {
         rentals = await db.query(`
         SELECT rentals.*, json_build_object('id', customers.id, 'name', customers.name) AS customer,
         json_build_object('id', games.id, 'name', games.name) AS game

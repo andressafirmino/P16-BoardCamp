@@ -10,7 +10,7 @@ export async function getCustomers(req, res) {
 
         if (typeof cpf !== 'undefined' && cpf !== '') {
             customers.push(`${cpf}%`);
-            query += 'WHERE cpf LIKE $1';
+            query += ' WHERE cpf LIKE $1';
         }
         if (typeof offset !== 'undefined' && offset !== '') {
             customers.push(offset);

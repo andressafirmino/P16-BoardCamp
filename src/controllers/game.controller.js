@@ -11,7 +11,7 @@ export async function getGame(req, res) {
 
         if (typeof name !== 'undefined' && name !== '') {
             games.push(`${name}%`);
-            query += 'WHERE name LIKE $1';
+            query += ' WHERE name LIKE $1';
         }
         if (typeof offset !== 'undefined' && offset !== '') {
             games.push(offset);
