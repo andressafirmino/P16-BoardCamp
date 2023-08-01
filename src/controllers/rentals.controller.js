@@ -110,9 +110,7 @@ export async function postRentals(req, res) {
         res.status(500).send(e.message);
     }
 }
-// dias atrasados
 let delay = 0;
-// multa por atraso
 let delayF = 0;
 function counterDays(rented, days, returned) {
 
